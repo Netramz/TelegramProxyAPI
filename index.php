@@ -62,9 +62,13 @@ class TelegramApiProxy {
 
 	private function sendRequest(){
 		$method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+		$method = 'GET';
+		
 		$this->log('HTTP Request: ' . $method);
 
-		if($method == 'POST'){
+		$this->log('HTTP Request2: ' . file_get_contents('php://input'));
+		
+		if($method == 'POST' || file_get_contents('php://input')!='' || sizeof($_POST)>0){
 			curl_setopt($this->ch, CURLOPT_POST, true);
 		
 			if(sizeof($_FILES) > 0){
@@ -82,7 +86,8 @@ class TelegramApiProxy {
 				$ct = $_SERVER['HTTP_CONTENT_TYPE'] ?? $_SERVER['CONTENT_TYPE'];
 				curl_setopt($this->ch, CURLOPT_HTTPHEADER, ['Content-type: ' . $ct]);
 			}
-
+			
+            $this->log('Send To Telegram HTTP Request body: ' . json_encode($post,JSON_UNESCAPED_UNICODE ));
 			curl_setopt($this->ch, CURLOPT_POSTFIELDS, $post);
 			$this->log('Send data: ' . var_export($post, true));
 
@@ -93,6 +98,6 @@ class TelegramApiProxy {
 }
 
 $proxy = new TelegramApiProxy;
-$proxy->setLog(true); // use logs only for debug
+$proxy->setLog(false); // use logs only for debug
 $proxy->start();
 ?>
