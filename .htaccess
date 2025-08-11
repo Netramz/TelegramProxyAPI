@@ -1,6 +1,48 @@
+# ---------------------------------------------------------
+# Enable Apache mod_rewrite for clean and dynamic URL handling
+# ---------------------------------------------------------
 RewriteEngine On
+
+# ---------------------------------------------------------
+# Define the base URL path for the rewrite rules
+# Adjust this if the project is in a subfolder (e.g., /myapp/)
+# ---------------------------------------------------------
 RewriteBase /
+
+# ---------------------------------------------------------
+# Prevent rewriting the index.php file itself
+# This ensures direct access to index.php remains unchanged
+# ---------------------------------------------------------
 RewriteRule ^index\.php$ - [L]
+
+# ---------------------------------------------------------
+# Condition: Requested resource does NOT match an existing file
+# ---------------------------------------------------------
 RewriteCond %{REQUEST_FILENAME} !-f
+
+# ---------------------------------------------------------
+# Condition: Requested resource does NOT match an existing directory
+# ---------------------------------------------------------
 RewriteCond %{REQUEST_FILENAME} !-d
+
+# ---------------------------------------------------------
+# Redirect all other requests to index.php
+# This allows a single PHP entry point to handle routing
+# ---------------------------------------------------------
 RewriteRule . /index.php [L]
+
+# =========================================================
+# Additional Security Headers (Optional but Recommended)
+# =========================================================
+
+# Prevent MIME type sniffing by browsers
+Header set X-Content-Type-Options "nosniff"
+
+# Disallow embedding the site in iframes to prevent clickjacking
+Header set X-Frame-Options "DENY"
+
+# Enforce secure HTTP Referrer Policy
+Header always set Referrer-Policy "no-referrer-when-downgrade"
+
+# Mitigate some cross-site scripting (XSS) attacks
+Header set X-XSS-Protection "1; mode=block"
